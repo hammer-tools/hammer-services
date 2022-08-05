@@ -1,6 +1,3 @@
-### Project ###
-buildSrc/
-
 ### Gradle ###
 .gradle
 !gradle/wrapper/gradle-wrapper.jar
