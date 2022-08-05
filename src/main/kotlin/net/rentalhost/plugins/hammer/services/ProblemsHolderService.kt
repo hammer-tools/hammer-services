@@ -12,12 +12,12 @@ import com.intellij.refactoring.suggested.startOffset
 private val inspectionsCountKeys =
     Key<Boolean>("inspectionsCountedKey")
 
-object ProblemsHolderService {
+abstract class ProblemsHolderService(private val projectService: ProjectService) {
     private fun increaseInspections(element: PsiElement) {
         if (element.getUserData(inspectionsCountKeys) == null) {
             element.putUserData(inspectionsCountKeys, true)
 
-            SettingsService.increaseInspections()
+            projectService.settings.increaseInspections()
         }
     }
 
@@ -32,7 +32,7 @@ object ProblemsHolderService {
         increaseInspections(element)
 
         problemsHolder.registerProblem(
-            element, "\uD83D\uDD28 PHP Hammer: $descriptionTemplate.",
+            element, "\uD83D\uDD28 ${projectService.name}: $descriptionTemplate.",
             problemHighlightType ?: ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
             textRange, localQuickFix
         )
@@ -44,14 +44,7 @@ object ProblemsHolderService {
         descriptionTemplate: String,
         localQuickFix: LocalQuickFix? = null,
         problemHighlightType: ProblemHighlightType? = null
-    ): Unit = registerProblem(
-        problemsHolder,
-        element,
-        null,
-        descriptionTemplate,
-        localQuickFix,
-        problemHighlightType
-    )
+    ): Unit = registerProblem(problemsHolder, element, null, descriptionTemplate, localQuickFix, problemHighlightType)
 
     fun registerProblem(
         problemsHolder: ProblemsHolder,

@@ -4,9 +4,9 @@ import com.intellij.psi.PsiElement
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression
 import com.jetbrains.php.lang.psi.elements.impl.ArrayHashElementImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpPsiElementImpl
-import net.rentalhost.plugins.hammer.services.TypeService
 import net.rentalhost.plugins.hammer.services.ElementService
 import net.rentalhost.plugins.hammer.services.FactoryService
+import net.rentalhost.plugins.hammer.services.TypeService
 
 fun ArrayCreationExpression.unpackValues(): MutableList<PsiElement> {
     val arrayElements = mutableListOf<PsiElement>()

@@ -1,4 +1,4 @@
-package net.rentalhost.plugins.hammer.services.listeners
+package net.rentalhost.plugins.hammer.services
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.ide.plugins.PluginManagerCore
@@ -6,22 +6,18 @@ import com.intellij.notification.Notification
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManagerListener
-import net.rentalhost.plugins.hammer.services.NotificationService
 import net.rentalhost.plugins.hammer.services.NotificationService.NotificationItem
-import net.rentalhost.plugins.hammer.services.ResourceService
-import net.rentalhost.plugins.hammer.services.SettingsService
-import net.rentalhost.plugins.hammer.services.UrlService
 import java.time.ZonedDateTime
 
-internal class PluginUpdateListener: ProjectManagerListener {
+abstract class PluginUpdateService(val projectService: ProjectService): ProjectManagerListener {
     private val plugin: IdeaPluginDescriptor = PluginManagerCore.getPlugin(PluginId.findId("net.rentalhost.plugins.php.hammer"))!!
 
-    private val tripleHome = NotificationItem("home", "project home", "home", UrlService.homeUrl)
-    private val tripleChangelog = NotificationItem("changelog", "changelog", UrlService.changelogUrl)
-    private val tripleFreemium = NotificationItem("freemium", "freemium", UrlService.freemiumUrl)
-    private val tripleInspections = NotificationItem("inspections", "inspections", UrlService.inspectionsUrl)
+    private val tripleHome = NotificationItem("home", "project home", "home", projectService.urls.homeUrl)
+    private val tripleChangelog = NotificationItem("changelog", "changelog", projectService.urls.changelogUrl)
+    private val tripleFreemium = NotificationItem("freemium", "freemium", projectService.urls.freemiumUrl)
+    private val tripleInspections = NotificationItem("inspections", "inspections", projectService.urls.inspectionsUrl)
 
-    private val tripleReviewNow = NotificationItem("review", "review", UrlService.reviewsUrl) { notification -> closeReview(notification) }
+    private val tripleReviewNow = NotificationItem("review", "review", projectService.urls.reviewsUrl) { notification -> closeReview(notification) }
     private val tripleReviewLater = NotificationItem("Remember later") { notification -> closeReview(notification, true) }
     private val tripleReviewNever = NotificationItem("Never ask again") { notification -> closeReview(notification) }
     private val tripleReviewHome = tripleHome.withoutActionButton()
@@ -30,12 +26,12 @@ internal class PluginUpdateListener: ProjectManagerListener {
         notification.expire()
 
         if (disableReview) {
-            SettingsService.Review.disableReviewNotification()
+            projectService.settings.reviewDisable()
         }
     }
 
     override fun projectOpened(project: Project) {
-        with(SettingsService.getInstance().state) {
+        with(projectService.settings.getServiceInstance().state) {
             countProjects++
 
             if (!pluginFreshInstalled) {
@@ -46,7 +42,7 @@ internal class PluginUpdateListener: ProjectManagerListener {
             else if (pluginVersion != plugin.version) {
                 notifyUpdate(pluginVersion, plugin.version)
             }
-            else if (SettingsService.Review.isReviewTime()) {
+            else if (projectService.settings.isReviewTime()) {
                 notifyReview()
             }
 
@@ -78,7 +74,7 @@ internal class PluginUpdateListener: ProjectManagerListener {
     )
 
     private fun notifyReview() {
-        SettingsService.Review.rememberReviewNotificationLater()
+        projectService.settings.reviewRememberLater()
 
         NotificationService.notify(
             "net.rentalhost.plugins.notification.REVIEW",

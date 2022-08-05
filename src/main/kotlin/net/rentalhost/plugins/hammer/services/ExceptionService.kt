@@ -15,11 +15,9 @@ import io.sentry.SentryOptions
 import io.sentry.protocol.Message
 import java.awt.Component
 
-class ExceptionService: ErrorReportSubmitter() {
+abstract class ExceptionService(private val projectService: ProjectService): ErrorReportSubmitter() {
     private val initializeSentry: Unit by lazy {
-        Sentry.init { options: SentryOptions ->
-            options.dsn = "https://0046f19fa48247e198f0a5cb21afc0db@o55698.ingest.sentry.io/6612594"
-        }
+        Sentry.init { options: SentryOptions -> options.dsn = projectService.sentryDsn }
     }
 
     override fun submit(
@@ -63,5 +61,5 @@ class ExceptionService: ErrorReportSubmitter() {
     }
 
     override fun getReportActionText(): String =
-        "Report to PHP Hammer plugin"
+        "Report to ${projectService.name} plugin"
 }

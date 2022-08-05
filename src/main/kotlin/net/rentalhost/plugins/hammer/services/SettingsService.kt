@@ -1,28 +1,15 @@
 package net.rentalhost.plugins.hammer.services
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.State
-import com.intellij.openapi.components.Storage
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import net.rentalhost.plugins.hammer.services.SettingsService.Companion.State as SettingsState
 
-@State(name = "PHPHammerState", storages = [Storage("php-hammer.state.xml")])
-class SettingsService: PersistentStateComponent<SettingsState> {
+const val REVIEW_DISABLED: Long = -1L
+
+abstract class SettingsService: PersistentStateComponent<SettingsState> {
     companion object {
-        fun getInstance(): SettingsService =
-            ApplicationManager.getApplication().getService(SettingsService::class.java)
-
-        fun increaseFixes() {
-            getInstance().state.countFixes++
-        }
-
-        fun increaseInspections() {
-            getInstance().state.countInspections++
-        }
-
         class State {
             var pluginFreshInstalled: Boolean = false
             var pluginVersion: String? = null
@@ -33,31 +20,37 @@ class SettingsService: PersistentStateComponent<SettingsState> {
             var countInspections: Long = 0
             var countFixes: Long = 0
 
-            var reviewAfter: Long = Review.DISABLED_STATE
+            var reviewAfter: Long = REVIEW_DISABLED
         }
     }
 
-    object Review {
-        const val DISABLED_STATE: Long = -1L
+    abstract fun getServiceInstance(): SettingsService
 
-        fun isReviewTime(): Boolean {
-            val reviewAt = getInstance().state.reviewAfter
+    fun increaseFixes() {
+        getServiceInstance().state.countFixes++
+    }
 
-            if (reviewAt == DISABLED_STATE)
-                return false
+    fun increaseInspections() {
+        getServiceInstance().state.countInspections++
+    }
 
-            val date = ZonedDateTime.now()
+    fun reviewRememberLater() {
+        getServiceInstance().state.reviewAfter = ZonedDateTime.now().plusDays(30).toEpochSecond()
+    }
 
-            return date.isAfter(ZonedDateTime.ofInstant(Instant.ofEpochSecond(reviewAt), ZoneOffset.UTC))
-        }
+    fun reviewDisable() {
+        getServiceInstance().state.reviewAfter = REVIEW_DISABLED
+    }
 
-        fun rememberReviewNotificationLater() {
-            getInstance().state.reviewAfter = ZonedDateTime.now().plusDays(30).toEpochSecond()
-        }
+    fun isReviewTime(): Boolean {
+        val reviewAt = getServiceInstance().state.reviewAfter
 
-        fun disableReviewNotification() {
-            getInstance().state.reviewAfter = DISABLED_STATE
-        }
+        if (reviewAt == REVIEW_DISABLED)
+            return false
+
+        val date = ZonedDateTime.now()
+
+        return date.isAfter(ZonedDateTime.ofInstant(Instant.ofEpochSecond(reviewAt), ZoneOffset.UTC))
     }
 
     private var myState = SettingsState()
