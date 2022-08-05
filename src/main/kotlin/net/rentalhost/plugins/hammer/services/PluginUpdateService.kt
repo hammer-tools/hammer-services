@@ -9,8 +9,8 @@ import com.intellij.openapi.project.ProjectManagerListener
 import net.rentalhost.plugins.hammer.services.NotificationService.NotificationItem
 import java.time.ZonedDateTime
 
-abstract class PluginUpdateService(val projectService: ProjectService): ProjectManagerListener {
-    private val plugin: IdeaPluginDescriptor = PluginManagerCore.getPlugin(PluginId.findId("net.rentalhost.plugins.php.hammer"))!!
+abstract class PluginUpdateService(private val projectService: ProjectService): ProjectManagerListener {
+    private val plugin: IdeaPluginDescriptor = PluginManagerCore.getPlugin(PluginId.findId(projectService.id))!!
 
     private val tripleHome = NotificationItem("home", "project home", "home", projectService.urls.homeUrl)
     private val tripleChangelog = NotificationItem("changelog", "changelog", projectService.urls.changelogUrl)
