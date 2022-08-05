@@ -59,14 +59,14 @@ abstract class PluginUpdateService(val projectService: ProjectService): ProjectM
 
     private fun notifyInstall() {
         NotificationService.notify(
-            "net.rentalhost.plugins.notification.INSTALLED",
+            "${projectService.notificationGroup}.PLUGIN_RELATED",
             ResourceService.read("/plugin/welcome.html"),
             listOf(tripleHome, tripleInspections, tripleFreemium)
         )
     }
 
     private fun notifyUpdate(versionBefore: String?, versionAfter: String) = NotificationService.notify(
-        "net.rentalhost.plugins.notification.UPDATED",
+        "${projectService.notificationGroup}.PLUGIN_RELATED",
         ResourceService.read("/plugin/news.html")
             .replace("\$beforeNote", if (versionBefore != null) ", replacing the previously installed version (was $versionBefore)" else "")
             .replace("\$pluginVersion", versionAfter),
@@ -77,7 +77,7 @@ abstract class PluginUpdateService(val projectService: ProjectService): ProjectM
         projectService.settings.reviewRememberLater()
 
         NotificationService.notify(
-            "net.rentalhost.plugins.notification.REVIEW",
+            "${projectService.notificationGroup}.PLUGIN_RELATED",
             ResourceService.read("/plugin/review.html"),
             listOf(tripleReviewNow, tripleReviewLater, tripleReviewNever, tripleReviewHome)
         )

@@ -5,6 +5,8 @@ abstract class ProjectService {
 
     abstract val sentryDsn: String
 
+    abstract val notificationGroup: String
+
     abstract val urls: UrlService
 
     abstract val settings: SettingsService
