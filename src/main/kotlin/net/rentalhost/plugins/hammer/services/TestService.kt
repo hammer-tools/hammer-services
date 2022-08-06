@@ -41,7 +41,7 @@ abstract class TestCase: BasePlatformTestCase() {
         phpLanguageLevel: PhpLanguageLevel? = null,
         quickFixesEnabled: Boolean? = null
     ) {
-        val phpSourceBase = inspectionClass.name.substring(classBaseLength + 1).replace(".", "/")
+        val phpSourceBase = inspectionClass.name.substringAfter(".hammer.").replace(".", "/")
         val phpSourceSub = phpSourceSubNames?.first() ?: "default"
 
         val phpInspection: T = try {
@@ -83,9 +83,5 @@ abstract class TestCase: BasePlatformTestCase() {
                 }
             }
         }
-    }
-
-    companion object {
-        private const val classBaseLength = "net.rentalhost.plugins.php.hammer".length
     }
 }
