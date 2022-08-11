@@ -3,24 +3,22 @@ package net.rentalhost.plugins.hammer.services
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
-import com.intellij.psi.codeStyle.CodeStyleSettings
-import com.intellij.psi.codeStyle.CodeStyleSettingsManager
 import com.intellij.psi.impl.source.tree.LeafPsiElement
-import com.jetbrains.php.lang.formatter.ui.predefinedStyle.PSR12CodeStyle
 import com.jetbrains.php.lang.psi.elements.ClassReference
 import com.jetbrains.php.lang.psi.elements.ConstantReference
 import com.jetbrains.php.lang.psi.elements.impl.NewExpressionImpl
 import net.rentalhost.plugins.hammer.extensions.psi.isExactly
 
+typealias Appender = (String) -> Unit
+typealias PreProcessor = (PsiElement, Appender) -> Boolean
+
 object FormatterService {
-    private val projectCodeStyle: CodeStyleSettings = CodeStyleSettingsManager().createSettings()
-
-    init {
-        PSR12CodeStyle().apply(projectCodeStyle)
-    }
-
     private object ElementReassemble {
-        fun visit(element: PsiElement, appender: (String) -> Unit) {
+        fun visit(element: PsiElement, appender: Appender, preProcessor: PreProcessor? = null) {
+            if (preProcessor != null && !preProcessor.invoke(element, appender)) {
+                return
+            }
+
             when {
                 element is PsiComment ||
                 element is PsiWhiteSpace -> return
@@ -41,7 +39,7 @@ object FormatterService {
                     }
 
                     while (child != null) {
-                        visit(child, appender)
+                        visit(child, appender, preProcessor)
                         child = child.nextSibling
                     }
                 }
@@ -49,10 +47,10 @@ object FormatterService {
         }
     }
 
-    fun normalize(element: PsiElement): String {
+    fun normalize(element: PsiElement, preProcessor: PreProcessor? = null): String {
         var elementText = ""
 
-        ElementReassemble.visit(element) { s -> elementText += "$s\u0000" }
+        ElementReassemble.visit(element, { s -> elementText += "$s\u0000" }, preProcessor)
 
         return elementText
     }

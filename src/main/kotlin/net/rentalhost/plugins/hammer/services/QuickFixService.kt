@@ -8,7 +8,7 @@ import com.intellij.psi.SmartPsiElementPointer
 import com.jetbrains.php.lang.psi.elements.PhpTypeDeclaration
 import net.rentalhost.plugins.hammer.extensions.psi.replaceWith
 
-@Suppress("PublicApiImplicitType", "unused", "MemberVisibilityCanBePrivate")
+@Suppress("PublicApiImplicitType")
 abstract class QuickFixService(private val projectService: ProjectService) {
     abstract class SimpleQuickFix constructor(private val quickFixTitle: String): LocalQuickFix {
         override fun getFamilyName(): String = "\uD83D\uDD28 $quickFixTitle"
