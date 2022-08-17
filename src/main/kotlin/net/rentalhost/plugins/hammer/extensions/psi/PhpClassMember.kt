@@ -4,22 +4,28 @@ import com.jetbrains.php.PhpClassHierarchyUtils
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.PhpClassMember
 
-fun PhpClass.hasTrait(name: String): Boolean {
+private fun containsName(baseClass: PhpClass, name: String, subject: (PhpClass) -> Array<String>): Boolean {
     var found = false
 
-    PhpClassHierarchyUtils.processSuperClasses(this, true, true) { phpClass ->
-        phpClass.traitNames.forEach { traitName ->
-            if (traitName == name) {
+    PhpClassHierarchyUtils.processSupers(baseClass, true, true) { phpClass ->
+        subject.invoke(phpClass).forEach { subjectName ->
+            if (subjectName == name) {
                 found = true
-                return@processSuperClasses false
+                return@processSupers false
             }
         }
 
-        return@processSuperClasses true
+        return@processSupers true
     }
 
     return found
 }
+
+fun PhpClass.hasTrait(name: String): Boolean =
+    containsName(this, name) { phpClass -> phpClass.traitNames }
+
+fun PhpClass.hasInterface(name: String): Boolean =
+    containsName(this, name) { phpClass -> phpClass.interfaceNames }
 
 fun PhpClassMember.isMemberOverridden(): Boolean {
     var isOverridden = false

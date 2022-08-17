@@ -34,7 +34,7 @@ abstract class QuickFixService(private val projectService: ProjectService) {
 
     fun simpleLeafReplace(
         quickFixTitle: String,
-        leafReplacement: SmartPsiElementPointer<PsiElement>
+        leafReplacement: SmartPsiElementPointer<out PsiElement>
     ) = object: SimpleQuickFix(quickFixTitle) {
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             with(leafReplacement.element ?: return) {
@@ -47,7 +47,7 @@ abstract class QuickFixService(private val projectService: ProjectService) {
 
     fun simpleDelete(
         quickFixTitle: String,
-        element: SmartPsiElementPointer<PsiElement>? = null
+        element: SmartPsiElementPointer<out PsiElement>? = null
     ) = object: SimpleQuickFix(quickFixTitle) {
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             projectService.settings.increaseFixes()
@@ -58,8 +58,8 @@ abstract class QuickFixService(private val projectService: ProjectService) {
 
     fun simpleReplace(
         quickFixTitle: String,
-        replaceFrom: SmartPsiElementPointer<PsiElement>? = null,
-        replaceTo: SmartPsiElementPointer<PsiElement>
+        replaceFrom: SmartPsiElementPointer<out PsiElement>? = null,
+        replaceTo: SmartPsiElementPointer<out PsiElement>
     ) = object: SimpleQuickFix(quickFixTitle) {
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             with(replaceTo.element ?: return) {
@@ -70,7 +70,7 @@ abstract class QuickFixService(private val projectService: ProjectService) {
         }
     }
 
-    fun simpleReplace(quickFixTitle: String, replaceTo: SmartPsiElementPointer<PsiElement>) =
+    fun simpleReplace(quickFixTitle: String, replaceTo: SmartPsiElementPointer<out PsiElement>) =
         simpleReplace(quickFixTitle, null, replaceTo)
 
     fun simpleInline(
