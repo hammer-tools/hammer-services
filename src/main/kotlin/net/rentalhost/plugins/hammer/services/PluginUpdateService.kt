@@ -5,11 +5,11 @@ import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.notification.Notification
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManagerListener
+import com.intellij.openapi.startup.StartupActivity
 import net.rentalhost.plugins.hammer.services.NotificationService.NotificationItem
 import java.time.ZonedDateTime
 
-abstract class PluginUpdateService(private val projectService: ProjectService): ProjectManagerListener {
+abstract class PluginUpdateService(private val projectService: ProjectService): StartupActivity {
     private val plugin: IdeaPluginDescriptor = PluginManagerCore.getPlugin(PluginId.findId(projectService.id))!!
 
     private val tripleHome = NotificationItem("home", "project home", "home", projectService.urls.homeUrl)
@@ -30,7 +30,7 @@ abstract class PluginUpdateService(private val projectService: ProjectService): 
         }
     }
 
-    override fun projectOpened(project: Project) {
+    override fun runActivity(project: Project) {
         with(projectService.settings.getServiceInstance().state) {
             countProjects++
 
