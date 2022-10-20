@@ -129,6 +129,9 @@ object FactoryService {
     fun createArrayKeyValue(project: Project, key: String, value: String): ArrayHashElement =
         PhpPsiElementFactory.createPhpPsiFromText(project, ArrayHashElement::class.java, "[$key=>$value]")
 
+    fun createArrayCreationExpression(project: Project, elements: List<ArrayHashElement>): ArrayCreationExpression =
+        PhpPsiElementFactory.createPhpPsiFromText(project, ArrayCreationExpression::class.java, "[${elements.joinToString(",") { e -> e.text }}]")
+
     fun createTypeCastExpression(project: Project, castType: String, expression: String): UnaryExpression =
         PhpPsiElementFactory.createPhpPsiFromText(project, UnaryExpression::class.java, "($castType) $expression")
 
