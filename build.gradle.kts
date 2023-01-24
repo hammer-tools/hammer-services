@@ -4,12 +4,12 @@ fun prop(key: String) = project.findProperty(key).toString()
 
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.9.0"
-    id("org.jetbrains.kotlin.jvm") version "1.7.20"
+    id("org.jetbrains.intellij") version "1.10.1"
+    id("org.jetbrains.kotlin.jvm") version "1.8.0"
 }
 
 dependencies {
-    implementation("io.sentry:sentry:6.3.0")
+    implementation("io.sentry:sentry:6.12.1")
 }
 
 group = prop("pluginId")
