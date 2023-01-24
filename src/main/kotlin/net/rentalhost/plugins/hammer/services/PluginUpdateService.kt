@@ -14,7 +14,6 @@ abstract class PluginUpdateService(private val projectService: ProjectService): 
 
     private val tripleHome = NotificationItem("home", "project home", "home", projectService.urls.homeUrl)
     private val tripleChangelog = NotificationItem("changelog", "changelog", projectService.urls.changelogUrl)
-    private val tripleFreemium = NotificationItem("freemium", "freemium", projectService.urls.freemiumUrl)
     private val tripleInspections = NotificationItem("inspections", "inspections", projectService.urls.inspectionsUrl)
 
     private val tripleReviewNow = NotificationItem("review", "review", projectService.urls.reviewsUrl) { notification -> closeReview(notification) }
@@ -61,7 +60,7 @@ abstract class PluginUpdateService(private val projectService: ProjectService): 
         NotificationService.notify(
             "${projectService.notificationGroup}.PLUGIN_RELATED",
             ResourceService.read("/plugin/welcome.html"),
-            listOf(tripleHome, tripleInspections, tripleFreemium)
+            listOf(tripleHome, tripleInspections)
         )
     }
 
@@ -70,7 +69,7 @@ abstract class PluginUpdateService(private val projectService: ProjectService): 
         ResourceService.read("/plugin/news.html")
             .replace("\$beforeNote", if (versionBefore != null) ", replacing the previously installed version (was $versionBefore)" else "")
             .replace("\$pluginVersion", versionAfter),
-        listOf(tripleChangelog, tripleFreemium)
+        listOf(tripleChangelog)
     )
 
     private fun notifyReview() {
