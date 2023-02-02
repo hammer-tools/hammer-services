@@ -48,6 +48,10 @@ tasks {
         dependsOn("generateChangelog")
     }
 
+    buildSearchableOptions {
+        enabled = false
+    }
+
     wrapper {
         gradleVersion = prop("gradleVersion")
     }
