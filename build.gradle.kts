@@ -4,12 +4,13 @@ fun prop(key: String) = project.findProperty(key).toString()
 
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.10.1"
-    id("org.jetbrains.kotlin.jvm") version "1.8.0"
+    id("org.jetbrains.intellij") version "1.13.3"
+    id("org.jetbrains.kotlin.jvm") version "1.8.21"
 }
 
 dependencies {
     implementation("io.sentry:sentry:6.12.1")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 group = prop("pluginId")
@@ -26,7 +27,7 @@ apply {
 intellij {
     pluginName.set(prop("pluginName"))
     version.set(prop("platformVersion"))
-    type.set("IU")
+    type.set("PS")
 
     plugins.set(listOf("com.jetbrains.php:${prop("platformPhpBuild")}"))
 }
@@ -55,4 +56,16 @@ tasks {
     wrapper {
         gradleVersion = prop("gradleVersion")
     }
+}
+
+val compileKotlin: KotlinCompile by tasks
+
+compileKotlin.kotlinOptions {
+    jvmTarget = "17"
+}
+
+val compileTestKotlin: KotlinCompile by tasks
+
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "17"
 }

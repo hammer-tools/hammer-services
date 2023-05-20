@@ -31,6 +31,15 @@ abstract class ProblemsHolderService(private val projectService: ProjectService)
     ) {
         increaseInspections(element)
 
+        if (localQuickFix == null) {
+            problemsHolder.registerProblem(
+                element, "\uD83D\uDD28 ${projectService.name}: $descriptionTemplate.",
+                problemHighlightType ?: ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+                textRange
+            )
+            return
+        }
+
         problemsHolder.registerProblem(
             element, "\uD83D\uDD28 ${projectService.name}: $descriptionTemplate.",
             problemHighlightType ?: ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
